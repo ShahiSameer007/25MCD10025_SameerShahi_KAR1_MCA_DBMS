@@ -95,3 +95,4 @@ order by
         when violation_count between 4 and 6 then 3
         else 4
     end;
+
