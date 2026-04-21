@@ -128,8 +128,24 @@ with left:
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button(f"Check Balance", key=f"bal_{acc_id}"):
-            st.success(f"Balance: ₹ {balance}")
+        btn_col1, btn_col2, _ = st.columns([1, 1, 2], gap="small")
+
+        with btn_col1:
+            if st.button("Check Balance", key=f"bal_{acc_id}"):
+                st.success(f"Balance: ₹ {balance}")
+
+        with btn_col2:
+            if st.button("❌ Delete", key=f"del_{acc_id}"):
+                conn = get_connection()
+                cur = conn.cursor()
+                try:
+                    cur.execute("DELETE FROM transactions WHERE account_id = %s;", (acc_id,))
+                    cur.execute("DELETE FROM accounts WHERE account_id = %s;", (acc_id,))
+                    conn.commit()
+                    st.success("Account deleted successfully")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to delete account: {e}")
 
 # ----------- RIGHT: OPERATIONS -----------
 with right:
@@ -186,6 +202,7 @@ with right:
                 st.success("Done")
             except:
                 st.error("Transfer failed")
+
 
 # ----------- TRANSACTION HISTORY TOGGLE -----------
 st.markdown("---")
